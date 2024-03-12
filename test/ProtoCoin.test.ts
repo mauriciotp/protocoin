@@ -12,8 +12,31 @@ describe("Lock", function () {
     return { protoCoin, owner, otherAccount };
   }
 
-  it("Should test", async function () {
+  it("Should have correct name", async function () {
     const { protoCoin, owner, otherAccount } = await loadFixture(deployFixture);
-    expect(true).to.equal(true);
+
+    const name = await protoCoin.name();
+    expect(name).to.equal("ProtoCoin");
+  });
+
+  it("Should have correct symbol", async function () {
+    const { protoCoin, owner, otherAccount } = await loadFixture(deployFixture);
+
+    const symbol = await protoCoin.symbol();
+    expect(symbol).to.equal("PRC");
+  });
+
+  it("Should have correct decimals", async function () {
+    const { protoCoin, owner, otherAccount } = await loadFixture(deployFixture);
+
+    const decimals = await protoCoin.decimals();
+    expect(decimals).to.equal(18);
+  });
+
+  it("Should have correct totalSupply", async function () {
+    const { protoCoin, owner, otherAccount } = await loadFixture(deployFixture);
+
+    const totalSupply = await protoCoin.totalSupply();
+    expect(totalSupply).to.equal(1000n * 10n ** 18n);
   });
 });
