@@ -39,4 +39,37 @@ describe("Lock", function () {
     const totalSupply = await protoCoin.totalSupply();
     expect(totalSupply).to.equal(1000n * 10n ** 18n);
   });
+
+  it("Should get balance", async function () {
+    const { protoCoin, owner, otherAccount } = await loadFixture(deployFixture);
+
+    const balance = await protoCoin.balanceOf(owner.address);
+    expect(balance).to.equal(1000n * 10n ** 18n);
+  });
+
+  it("Should transfer", async function () {
+    const { protoCoin, owner, otherAccount } = await loadFixture(deployFixture);
+
+    const balanceOwnerBefore = await protoCoin.balanceOf(owner.address);
+    const balanceOtherBefore = await protoCoin.balanceOf(otherAccount.address);
+
+    await protoCoin.transfer(otherAccount.address, 1n);
+
+    const balanceOwnerAfter = await protoCoin.balanceOf(owner.address);
+    const balanceOtherAfter = await protoCoin.balanceOf(otherAccount.address);
+
+    expect(balanceOwnerBefore).to.equal(1000n * 10n ** 18n);
+    expect(balanceOwnerAfter).to.equal(1000n * 10n ** 18n - 1n);
+    expect(balanceOtherBefore).to.equal(0);
+    expect(balanceOtherAfter).to.equal(1);
+  });
+
+  it("Should NOT transfer", async function () {
+    const { protoCoin, owner, otherAccount } = await loadFixture(deployFixture);
+
+    const instance = protoCoin.connect(otherAccount);
+    await expect(instance.transfer(owner.address, 1n)).to.be.revertedWith(
+      "Insufficient balance"
+    );
+  });
 });
