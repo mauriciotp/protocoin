@@ -84,4 +84,44 @@ describe('ProtoCoin', function () {
     );
     expect(value).to.equal(1);
   });
+
+  it('Should transfer from', async function () {
+    const { protoCoin, owner, otherAccount } = await loadFixture(deployFixture);
+
+    const balanceOwnerBefore = await protoCoin.balanceOf(owner.address);
+    const balanceOtherBefore = await protoCoin.balanceOf(otherAccount.address);
+
+    await protoCoin.approve(otherAccount.address, 10n);
+
+    const instance = protoCoin.connect(otherAccount);
+    await instance.transferFrom(owner.address, otherAccount.address, 5n);
+
+    const balanceOwnerAfter = await protoCoin.balanceOf(owner.address);
+    const balanceOtherAfter = await protoCoin.balanceOf(otherAccount.address);
+    const allowance = await protoCoin.allowance(owner, otherAccount);
+
+    expect(balanceOwnerBefore).to.equal(1000n * 10n ** 18n);
+    expect(balanceOwnerAfter).to.equal(1000n * 10n ** 18n - 5n);
+    expect(balanceOtherBefore).to.equal(0);
+    expect(balanceOtherAfter).to.equal(5);
+    expect(allowance).to.equal(5);
+  });
+
+  it('Should NOT transfer from (balance)', async function () {
+    const { protoCoin, owner, otherAccount } = await loadFixture(deployFixture);
+
+    const instance = protoCoin.connect(otherAccount);
+    await expect(
+      instance.transferFrom(otherAccount.address, otherAccount.address, 1n)
+    ).to.be.revertedWith('Insufficient balance');
+  });
+
+  it('Should NOT transfer from (allowance)', async function () {
+    const { protoCoin, owner, otherAccount } = await loadFixture(deployFixture);
+
+    const instance = protoCoin.connect(otherAccount);
+    await expect(
+      instance.transferFrom(owner.address, otherAccount.address, 1n)
+    ).to.be.revertedWith('Insufficient allowance');
+  });
 });
