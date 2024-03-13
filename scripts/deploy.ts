@@ -1,7 +1,7 @@
-import { ethers } from "hardhat";
+import { ethers } from 'hardhat';
 
 async function main() {
-  const protoCoin = await ethers.deployContract("ProtoCoin");
+  const protoCoin = await ethers.deployContract('ProtoCoin');
 
   await protoCoin.waitForDeployment();
 
